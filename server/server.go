@@ -2,7 +2,8 @@ package main
 
 import (
 	"context"
-	pb "route_guide/routeguide"
+
+	pb "github.com/bohdanstryber/route_guide/routeguide"
 )
 
 type routeGuideServer struct {
