@@ -23,6 +23,7 @@ var (
 )
 
 type routeGuideServer struct {
+	pb.UnimplementedRouteGuideServer
 	savedFeatures []*pb.Feature
 	routeNotes    map[string][]*pb.RouteNote
 }
