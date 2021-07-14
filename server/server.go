@@ -10,6 +10,7 @@ import (
 	"log"
 	"math"
 	"net"
+	"sync"
 	"time"
 
 	pb "github.com/bohdanstryber/route_guide/routeguide"
@@ -25,6 +26,7 @@ var (
 type routeGuideServer struct {
 	pb.UnimplementedRouteGuideServer
 	savedFeatures []*pb.Feature
+	mu            sync.Mutex
 	routeNotes    map[string][]*pb.RouteNote
 }
 
@@ -97,6 +99,12 @@ func (s *routeGuideServer) RouteChat(stream pb.RouteGuide_RouteChatServer) error
 		}
 
 		key := serialize(in.Location)
+
+		s.mu.Lock()
+		s.routeNotes[key] = append(s.routeNotes[key], in)
+		rn := make([]*pb.RouteNote, len(s.routeNotes[key]))
+		copy(rn, s.routeNotes[key])
+		s.mu.Unlock()
 
 		for _, note := range s.routeNotes[key] {
 			if err := stream.Send(note); err != nil {

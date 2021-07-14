@@ -91,6 +91,7 @@ func runRecordRoute(client pb.RouteGuideClient) {
 }
 
 func runRouteChat(client pb.RouteGuideClient) {
+	log.Println("Starting route chat...")
 	notes := []*pb.RouteNote{
 		{Location: &pb.Point{Latitude: 0, Longitude: 1}, Message: "First message"},
 		{Location: &pb.Point{Latitude: 0, Longitude: 2}, Message: "Second message"},
@@ -115,6 +116,7 @@ func runRouteChat(client pb.RouteGuideClient) {
 			in, err := stream.Recv()
 
 			if err == io.EOF {
+				log.Println("Closing route chat...")
 				close(waitc)
 
 				return
@@ -146,10 +148,11 @@ func randomPoint(r *rand.Rand) *pb.Point {
 }
 
 func main() {
+	flag.Parse()
 	var opts []grpc.DialOption
 
-	opts = append(opts, grpc.WithBlock())
 	opts = append(opts, grpc.WithInsecure())
+	opts = append(opts, grpc.WithBlock())
 
 	conn, err := grpc.Dial(*serverAddr, opts...)
 
@@ -161,15 +164,14 @@ func main() {
 
 	client := pb.NewRouteGuideClient(conn)
 
-	printFeature(client, &pb.Point{Latitude: 409146138, Longitude: -746188906})
+	// printFeature(client, &pb.Point{Latitude: 409146138, Longitude: -746188906})
+	// printFeature(client, &pb.Point{Latitude: 0, Longitude: 0})
 
-	printFeature(client, &pb.Point{Latitude: 0, Longitude: 0})
+	// printFeatures(client, &pb.Rectangle{
+	// 	Lo: &pb.Point{Latitude: 400000000, Longitude: -750000000},
+	// 	Hi: &pb.Point{Latitude: 420000000, Longitude: -730000000},
+	// })
 
-	printFeatures(client, &pb.Rectangle{
-		Lo: &pb.Point{Latitude: 400000000, Longitude: -750000000},
-		Hi: &pb.Point{Latitude: 420000000, Longitude: -730000000},
-	})
-
-	runRecordRoute(client)
+	// runRecordRoute(client)
 	runRouteChat(client)
 }
